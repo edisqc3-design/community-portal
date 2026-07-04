@@ -8,12 +8,13 @@ import AttendanceWidget from '@/components/widgets/AttendanceWidget'
 import PopularMembersWidget from '@/components/widgets/PopularMembersWidget'
 import LiveCommentsWidget from '@/components/widgets/LiveCommentsWidget'
 import AdSlot from '@/components/ads/AdSlot'
+import SponsorAdSlot from '@/components/ads/SponsorAdSlot'
 
 export default function HomePage() {
   return (
     <div className="home-shell" style={{ paddingTop: '16px', paddingBottom: '48px' }}>
       <aside className="ad-rail">
-        <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_LEFT} width={160} height={600} label="광고" />
+        <SponsorAdSlot />
       </aside>
 
       <div className="container">
@@ -37,7 +38,7 @@ export default function HomePage() {
             </div>
 
             <div className="ad-banner-wrap">
-              <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_INLINE} width={728} height={90} label="Google AdSense 광고 영역" />
+              <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_INLINE} maxWidth={728} />
             </div>
 
             <RecommendThumbGrid />
@@ -59,10 +60,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-
-      <aside className="ad-rail">
-        <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_RIGHT} width={160} height={600} label="광고" />
-      </aside>
     </div>
   )
 }

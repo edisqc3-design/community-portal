@@ -161,6 +161,10 @@ ul { list-style: none; }
 .banner {
   margin-top: 16px; border-radius: 8px; background: linear-gradient(120deg, var(--brand-pale), #fff);
   border: 1px solid var(--border); padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  width: calc(100% - 316px);
+}
+@media (max-width: 860px) {
+  .banner { width: 100%; }
 }
 .banner .txt b { display: block; font-size: 1.1rem; margin-bottom: 4px; }
 .banner .txt span { font-size: 0.8rem; color: var(--ink-soft); }

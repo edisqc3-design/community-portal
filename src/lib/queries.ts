@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase-server'
 import type { Board, Post, SponsorAd } from '@/types'
+import { getKstDateString } from '@/lib/date-utils'
 
 const POST_SELECT = `
   id, board_id, author_id, title, content, view_count, like_count, comment_count,
@@ -184,7 +185,7 @@ export async function getTodayAttendance(userId: string) {
     .from('attendance')
     .select('id')
     .eq('user_id', userId)
-    .eq('checked_date', new Date().toISOString().slice(0, 10))
+    .eq('checked_date', getKstDateString())
     .maybeSingle()
   return !!data
 }
@@ -269,7 +270,7 @@ export async function searchPosts(query: string, limit = 20): Promise<Post[]> {
 // ------------------------------------------------------------
 export async function getActiveSponsorAd(): Promise<SponsorAd | null> {
   const supabase = await createClient()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getKstDateString()
 
   const { data, error } = await supabase
     .from('sponsor_ads')

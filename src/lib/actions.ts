@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase-server'
 import { revalidatePath } from 'next/cache'
+import { getKstDateString } from '@/lib/date-utils'
 
 type ActionResult<T = undefined> = { success: true; data: T } | { success: false; error: string }
 
@@ -168,7 +169,7 @@ export async function checkAttendance(): Promise<ActionResult<{ points: number }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: '로그인이 필요합니다.' }
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getKstDateString()
   const { error } = await supabase.from('attendance').insert({ user_id: user.id, checked_date: today, points_earned: 10 })
 
   if (error) {

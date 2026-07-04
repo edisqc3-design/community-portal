@@ -16,10 +16,10 @@ export default function BoardNavTabsClient({ boards }: Props) {
   const moreRef = useRef<HTMLDivElement>(null)
 
   // 전부 보인다고 가정하고 시작 (측정 전 깜빡임 방지를 위해 넉넉하게 시작)
-  const [visibleCount, setVisibleCount] = useState(boards.length + 1)
+  const [visibleCount, setVisibleCount] = useState(boards.length)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
-  const allItems = [{ id: 'home', slug: '', name: '홈' }, ...boards.map(b => ({ id: b.id, slug: b.slug, name: b.name }))]
+  const allItems = boards.map(b => ({ id: b.id, slug: b.slug, name: b.name }))
 
   useLayoutEffect(() => {
     function measure() {

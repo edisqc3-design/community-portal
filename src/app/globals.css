@@ -100,7 +100,7 @@ ul { list-style: none; }
 /* ------------------------------------------------------------
    상단 유틸리티 바 + 검색 히어로 (TopBar.tsx)
    ------------------------------------------------------------ */
-.header-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; padding: 14px 0 4px; }
+.header-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; padding: 0 0 4px; }
 .header-left { order: 1; flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
 .icon-btn {
   width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
@@ -129,7 +129,7 @@ ul { list-style: none; }
 
 /* 네이버처럼 PC에서는 로고/아이콘과 검색창을 한 줄로 배치하고, 검색창은 가운데에 고정 폭으로 */
 @media (min-width: 769px) {
-  .header-row { flex-wrap: nowrap; padding: 16px 0 4px; }
+  .header-row { flex-wrap: nowrap; padding: 0 0 4px; }
   .search-hero { order: 2; flex: 1 1 auto; padding-bottom: 0; }
   .search-hero form { max-width: 520px; }
   .right-icons { order: 3; }

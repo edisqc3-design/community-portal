@@ -100,7 +100,7 @@ ul { list-style: none; }
 /* ------------------------------------------------------------
    상단 유틸리티 바 + 검색 히어로 (TopBar.tsx)
    ------------------------------------------------------------ */
-.header-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 0 4px; }
+.header-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; padding: 14px 0 4px; }
 .header-left { order: 1; flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
 .icon-btn {
   width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;

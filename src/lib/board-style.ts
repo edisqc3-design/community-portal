@@ -12,6 +12,9 @@ const ICON_BY_SLUG: Record<string, string> = {
   hotdeal: '🏷️',
   travel: '✈️',
   food: '🍜',
+  living: '🛋️',
+  health: '💪',
+  lotto: '🎱',
 }
 
 const COLOR_BY_SLUG: Record<string, string> = {
@@ -26,6 +29,9 @@ const COLOR_BY_SLUG: Record<string, string> = {
   hotdeal: '#dc2626',
   travel: '#2fa7c9',
   food: '#c2410c',
+  living: '#0d9488',
+  health: '#16a34a',
+  lotto: '#7a5cf0',
 }
 
 const COLOR_CYCLE = ['#3a7bf0', '#1fae67', '#ee7a3f', '#a05ce0', '#e0475c', '#2fa7c9', '#7a8a9a', '#c9a13a']

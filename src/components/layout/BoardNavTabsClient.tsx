@@ -33,7 +33,7 @@ export default function BoardNavTabsClient({ boards }: Props) {
       for (let i = 0; i < allItems.length; i++) {
         const el = itemRefs.current[i]
         if (!el) continue
-        const w = el.offsetWidth + 22 // gap 포함
+        const w = el.offsetWidth + 14 // gap 포함
         // 마지막 항목까지 다 들어가면 더보기 버튼 자리 안 빼도 됨
         const isLast = i === allItems.length - 1
         const reserve = isLast ? 0 : moreWidth

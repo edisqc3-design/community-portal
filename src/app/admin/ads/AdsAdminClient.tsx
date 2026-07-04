@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSponsorAdAdmin, deleteSponsorAdAdmin, toggleSponsorAdActiveAdmin } from '@/lib/admin-actions'
+import { getKstDateString } from '@/lib/date-utils'
 import type { SponsorAd } from '@/types'
 
 export default function AdsAdminClient({ initialAds }: { initialAds: SponsorAd[] }) {
@@ -75,7 +76,7 @@ export default function AdsAdminClient({ initialAds }: { initialAds: SponsorAd[]
     router.refresh()
   }
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getKstDateString()
   const isExpired = (ad: SponsorAd) => !!ad.end_date && ad.end_date < today
   const isScheduled = (ad: SponsorAd) => !!ad.start_date && ad.start_date > today
 

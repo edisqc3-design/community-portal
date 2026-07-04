@@ -111,19 +111,24 @@ ul { list-style: none; }
 .right-icons .nick { font-size: 0.84rem; color: var(--ink-soft); white-space: nowrap; }
 .right-icons .logout-btn { background: none; border: none; color: var(--ink-faint); font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
 
-.search-hero { display: flex; align-items: center; gap: 10px; padding-bottom: 14px; }
+.search-hero { display: flex; align-items: center; justify-content: center; gap: 10px; padding-bottom: 14px; }
 .search-mark {
   width: 38px; height: 38px; border-radius: 50%; background: var(--brand); color: #fff;
   display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0;
 }
 .search-hero form {
-  flex: 1; min-width: 0; display: flex; align-items: center; border: 2px solid var(--brand);
+  flex: 1; min-width: 0; max-width: 100%; display: flex; align-items: center; border: 2px solid var(--brand);
   border-radius: 22px; padding: 0 6px 0 16px; background: #fff;
 }
 .search-hero input { flex: 1; min-width: 0; border: none; outline: none; padding: 10px 0; font-size: 0.92rem; background: transparent; }
 .search-hero button {
   border: none; background: var(--brand); color: #fff; font-weight: 700;
   padding: 8px 18px; border-radius: 18px; cursor: pointer; font-size: 0.84rem; flex-shrink: 0;
+}
+
+/* 네이버처럼 PC에서는 검색창을 고정 폭으로 줄이고 가운데 정렬 */
+@media (min-width: 769px) {
+  .search-hero form { max-width: 520px; }
 }
 
 @media (max-width: 480px) {

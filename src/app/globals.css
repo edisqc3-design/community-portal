@@ -377,12 +377,19 @@ ul { list-style: none; }
 
 /* ------------------------------------------------------------
    메인화면 좌우 고정 애드센스 레일 (넓은 화면에서만 노출)
+   가운데 콘텐츠 컬럼을 1080px로 고정해서, 광고 영역 유무/크기와 무관하게
+   네비게이션 바(.nav-tabs)와 항상 동일한 폭·중앙 정렬을 갖도록 함
    ------------------------------------------------------------ */
-.home-shell { display: flex; justify-content: center; align-items: flex-start; gap: 24px; max-width: 1450px; margin: 0 auto; }
-.home-shell > .container { margin: 0 auto; width: 100%; max-width: 1080px; }
-.ad-rail { display: none; flex-shrink: 0; position: sticky; top: 84px; }
+.home-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1080px minmax(0, 1fr);
+  column-gap: 24px;
+  align-items: start;
+}
+.home-shell > .container { grid-column: 2; margin: 0; width: auto; max-width: none; }
+.ad-rail { grid-column: 1; justify-self: end; display: none; position: sticky; top: 84px; }
 @media (min-width: 1440px) { .ad-rail { display: block; } }
-/* 스폰서 광고가 없어 내용이 비어있으면(:empty) 완전히 접어서 home-shell의 gap이 폭에 영향을 주지 않게 함 */
+/* 스폰서 광고가 없어 내용이 비어있으면(:empty) 완전히 숨김 */
 .ad-rail:empty { display: none; }
 
 /* 홈 화면 섹션 구분선 (배너 아래 콘텐츠 블록들을 구분선으로 분리) */

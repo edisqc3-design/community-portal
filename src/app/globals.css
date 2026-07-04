@@ -187,33 +187,43 @@ ul { list-style: none; }
 }
 .nav-more-dropdown a:hover { background: var(--brand-pale); color: var(--brand-dark); }
 
-/* 햄버거 전체 메뉴 사이드패널 */
-.side-menu-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200;
-  display: flex; align-items: stretch; justify-content: flex-start;
+/* 햄버거 전체 사이트맵 드롭다운 (네이버 "전체서비스"형) */
+.sitemap-wrap { position: relative; }
+.sitemap-scrim {
+  position: fixed; inset: 0; background: rgba(20,30,25,0.25); z-index: 199;
 }
-.side-menu-panel {
-  width: min(300px, 82vw); height: 100%; background: #fff; box-shadow: 4px 0 24px rgba(0,0,0,0.15);
-  display: flex; flex-direction: column; animation: side-menu-in 0.18s ease-out;
+.sitemap-dropdown {
+  position: absolute; top: calc(100% + 10px); left: 0; z-index: 200;
+  width: min(560px, 88vw); background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(20,30,25,0.16); overflow: hidden;
+  animation: sitemap-in 0.16s ease-out;
 }
-@keyframes side-menu-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-.side-menu-header {
-  display: flex; align-items: center; justify-content: space-between; padding: 18px 18px 14px;
-  font-weight: 900; font-size: 1.05rem; color: var(--ink); border-bottom: 1px solid var(--border);
+@keyframes sitemap-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.sitemap-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 14px 18px;
+  font-weight: 900; font-size: 0.96rem; color: var(--ink); border-bottom: 1px solid var(--border); background: var(--brand-pale);
 }
-.side-menu-close { background: none; border: none; font-size: 1.1rem; color: var(--ink-faint); cursor: pointer; padding: 4px; }
-.side-menu-list { flex: 1; overflow-y: auto; padding: 10px 8px; }
-.side-menu-item {
-  display: flex; align-items: center; gap: 12px; padding: 11px 10px; border-radius: 8px;
-  font-size: 0.92rem; font-weight: 700; color: var(--ink);
+.sitemap-close { background: none; border: none; font-size: 1rem; color: var(--ink-faint); cursor: pointer; padding: 4px; }
+.sitemap-body { display: flex; gap: 0; max-height: 70vh; overflow-y: auto; }
+.sitemap-col { flex: 1; min-width: 0; padding: 14px 8px; }
+.sitemap-col + .sitemap-col { border-left: 1px solid var(--border); }
+.sitemap-col-title {
+  padding: 4px 10px 8px; font-size: 0.72rem; font-weight: 800; color: var(--ink-faint);
+  text-transform: uppercase; letter-spacing: 0.03em;
 }
-.side-menu-item:hover { background: var(--brand-pale); }
-.side-menu-item .ico {
-  width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-  font-size: 0.95rem; color: #fff; flex-shrink: 0;
+.sitemap-link {
+  display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 700; color: var(--ink);
 }
-.side-menu-divider {
-  margin: 14px 10px 6px; font-size: 0.72rem; font-weight: 800; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.03em;
+.sitemap-link:hover { background: var(--brand-pale); }
+.sitemap-link .ico {
+  width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; color: #fff; flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .sitemap-dropdown { position: fixed; top: 64px; left: 8px; right: 8px; width: auto; }
+  .sitemap-body { flex-direction: column; }
+  .sitemap-col + .sitemap-col { border-left: none; border-top: 1px solid var(--border); }
 }
 
 /* ------------------------------------------------------------

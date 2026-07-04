@@ -28,20 +28,26 @@ export default function HomePage() {
 
         <div className="home-layout">
           <div>
-            <div className="two-col-row">
-              <RankingWidget />
-              <RecentPostsList />
+            <div className="home-section">
+              <div className="two-col-row">
+                <RankingWidget />
+                <RecentPostsList />
+              </div>
             </div>
 
-            <div style={{ marginTop: '16px' }}>
+            <div className="home-section">
               <BoardPreviewCards />
             </div>
 
-            <div className="ad-banner-wrap">
-              <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_INLINE} maxWidth={728} />
+            <div className="home-section">
+              <div className="ad-banner-wrap" style={{ margin: 0 }}>
+                <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_INLINE} maxWidth={728} />
+              </div>
             </div>
 
-            <RecommendThumbGrid />
+            <div className="home-section">
+              <RecommendThumbGrid />
+            </div>
 
             <FeatureHighlights />
           </div>

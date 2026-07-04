@@ -127,12 +127,9 @@ ul { list-style: none; }
   padding: 8px 18px; border-radius: 18px; cursor: pointer; font-size: 0.84rem; flex-shrink: 0;
 }
 
-/* PC에서는 로고와 검색바를 한 줄로 배치하고, 서로 상단 끝을 정확히 맞춤 */
+/* PC에서도 검색바는 항상 1번째 줄(로고+관리자) 아래, 자체 줄에 위치 */
 @media (min-width: 769px) {
-  .header-row { flex-wrap: nowrap; }
-  .search-hero { order: 2; flex: 1 1 auto; padding-top: 0; padding-bottom: 0; }
   .search-hero form { max-width: 520px; }
-  .right-icons { order: 3; }
 }
 
 @media (max-width: 480px) {

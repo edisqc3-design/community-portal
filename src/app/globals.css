@@ -382,10 +382,23 @@ ul { list-style: none; }
 .home-shell > .container { margin: 0 auto; width: 100%; max-width: 1080px; }
 .ad-rail { display: none; flex-shrink: 0; position: sticky; top: 84px; }
 @media (min-width: 1440px) { .ad-rail { display: block; } }
+/* 스폰서 광고가 없어 내용이 비어있으면(:empty) 완전히 접어서 home-shell의 gap이 폭에 영향을 주지 않게 함 */
+.ad-rail:empty { display: none; }
 
 /* 홈 화면 섹션 구분선 (배너 아래 콘텐츠 블록들을 구분선으로 분리) */
 .home-section { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
 .home-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+/* 홈 화면 섹션 - 카드형 (배경 + 테두리 + 그림자로 감싸기) */
+.home-section-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(20,30,25,0.05);
+}
+.home-section-card:last-child { margin-bottom: 0; }
 
 
 /* ------------------------------------------------------------

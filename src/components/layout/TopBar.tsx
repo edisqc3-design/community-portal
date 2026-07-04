@@ -13,9 +13,20 @@ export default async function TopBar() {
 
   return (
     <div className="container">
-      <div className="util-row">
-        <HamburgerMenu boards={boards} />
-        <Link href="/" className="brand-logo">Community Portal</Link>
+      <div className="header-row">
+        <div className="header-left">
+          <HamburgerMenu boards={boards} />
+          <Link href="/" className="brand-logo">Community Portal</Link>
+        </div>
+
+        <div className="search-hero">
+          <div className="search-mark">C</div>
+          <form action="/search">
+            <input type="text" name="q" placeholder="궁금한 내용을 검색해 주세요" />
+            <button type="submit">검색</button>
+          </form>
+        </div>
+
         <div className="right-icons">
           {user && profile ? (
             <>
@@ -47,14 +58,6 @@ export default async function TopBar() {
             )}
           </Link>
         </div>
-      </div>
-
-      <div className="search-hero">
-        <div className="search-mark">C</div>
-        <form action="/search">
-          <input type="text" name="q" placeholder="궁금한 내용을 검색해 주세요" />
-          <button type="submit">검색</button>
-        </form>
       </div>
     </div>
   )

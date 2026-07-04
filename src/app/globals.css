@@ -127,12 +127,9 @@ ul { list-style: none; }
   padding: 8px 18px; border-radius: 18px; cursor: pointer; font-size: 0.84rem; flex-shrink: 0;
 }
 
-/* 네이버처럼 PC에서는 로고/아이콘과 검색창을 한 줄로 배치하고, 검색창은 가운데에 고정 폭으로 */
+/* PC에서도 검색창 폭만 고정하고, 로고/아이콘 줄 바로 아래에 검색창이 오도록 유지 */
 @media (min-width: 769px) {
-  .header-row { flex-wrap: nowrap; padding: 0 0 4px; }
-  .search-hero { order: 2; flex: 1 1 auto; padding-bottom: 0; }
   .search-hero form { max-width: 520px; }
-  .right-icons { order: 3; }
 }
 
 @media (max-width: 480px) {

@@ -39,11 +39,7 @@ export default function HomePage() {
               <BoardPreviewCards />
             </div>
 
-            <div className="home-section">
-              <div className="ad-banner-wrap" style={{ margin: 0 }}>
-                <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_INLINE} maxWidth={728} />
-              </div>
-            </div>
+            <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_INLINE} maxWidth={728} />
 
             <div className="home-section">
               <RecommendThumbGrid />

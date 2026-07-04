@@ -45,6 +45,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/posts">게시글 관리</Link>
           <Link href="/admin/reports">신고 관리</Link>
           <Link href="/admin/users">회원 관리</Link>
+          <Link href="/admin/ads">광고 관리</Link>
           <Link href="/" style={{ marginTop: '16px', opacity: 0.6 }}>← 사이트로 돌아가기</Link>
         </aside>
         <div className="admin-content">{children}</div>

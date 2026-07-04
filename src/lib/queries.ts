@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase-server'
-import type { Board, Post } from '@/types'
+import type { Board, Post, SponsorAd } from '@/types'
 
 const POST_SELECT = `
   id, board_id, author_id, title, content, view_count, like_count, comment_count,
@@ -260,4 +260,37 @@ export async function searchPosts(query: string, limit = 20): Promise<Post[]> {
     return []
   }
   return (data as unknown as Post[]) ?? []
+}
+
+// ------------------------------------------------------------
+// 스폰서 광고 (좌측 배너) — 애드센스가 아닌 직접 계약 광고
+// 노출 조건: is_active=true + (시작일 지났거나 없음) + (종료일 안 지났거나 없음)
+// 여러 개가 조건을 만족하면 weight(노출 가중치)를 반영한 랜덤으로 1개 선택
+// ------------------------------------------------------------
+export async function getActiveSponsorAd(): Promise<SponsorAd | null> {
+  const supabase = await createClient()
+  const today = new Date().toISOString().slice(0, 10)
+
+  const { data, error } = await supabase
+    .from('sponsor_ads')
+    .select('id, title, image_url, link_url, weight, is_active, start_date, end_date, created_at')
+    .eq('is_active', true)
+    .or(`start_date.is.null,start_date.lte.${today}`)
+    .or(`end_date.is.null,end_date.gte.${today}`)
+
+  if (error) {
+    console.error('getActiveSponsorAd error:', error.message)
+    return null
+  }
+  const candidates = (data as SponsorAd[]) ?? []
+  if (candidates.length === 0) return null
+  if (candidates.length === 1) return candidates[0]
+
+  const totalWeight = candidates.reduce((sum, ad) => sum + Math.max(ad.weight, 1), 0)
+  let roll = Math.random() * totalWeight
+  for (const ad of candidates) {
+    roll -= Math.max(ad.weight, 1)
+    if (roll <= 0) return ad
+  }
+  return candidates[candidates.length - 1]
 }

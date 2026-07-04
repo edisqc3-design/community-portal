@@ -18,16 +18,16 @@ export default function HomePage() {
       </aside>
 
       <div className="container">
-        <div className="banner">
-          <div className="txt">
-            <b>커뮤니티 오픈 이벤트 🎉</b>
-            <span>회원가입만 해도 2,000 포인트 지급!</span>
-          </div>
-          <span className="badge">자세히 보기</span>
-        </div>
-
         <div className="home-layout">
           <div>
+            <div className="banner">
+              <div className="txt">
+                <b>커뮤니티 오픈 이벤트 🎉</b>
+                <span>회원가입만 해도 2,000 포인트 지급!</span>
+              </div>
+              <span className="badge">자세히 보기</span>
+            </div>
+
             <div className="home-section">
               <div className="two-col-row">
                 <RankingWidget />

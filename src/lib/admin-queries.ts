@@ -50,6 +50,18 @@ export async function getAllReportsAdmin() {
   return data ?? []
 }
 
+// ------------------------------------------------------------
+// 스폰서 광고 관리
+// ------------------------------------------------------------
+export async function getAllSponsorAdsAdmin() {
+  const admin = createAdminClient()
+  const { data } = await admin
+    .from('sponsor_ads')
+    .select('id, title, image_url, link_url, weight, is_active, start_date, end_date, created_at')
+    .order('created_at', { ascending: false })
+  return data ?? []
+}
+
 export async function getAllUsersAdmin() {
   const supabase = await createClient()
   const { data } = await supabase

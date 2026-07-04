@@ -379,9 +379,13 @@ ul { list-style: none; }
    메인화면 좌우 고정 애드센스 레일 (넓은 화면에서만 노출)
    ------------------------------------------------------------ */
 .home-shell { display: flex; justify-content: center; align-items: flex-start; gap: 24px; max-width: 1450px; margin: 0 auto; }
-.home-shell > .container { margin: 0; width: 100%; }
+.home-shell > .container { margin: 0 auto; width: 100%; max-width: 1080px; }
 .ad-rail { display: none; flex-shrink: 0; position: sticky; top: 84px; }
 @media (min-width: 1440px) { .ad-rail { display: block; } }
+
+/* 홈 화면 섹션 구분선 (배너 아래 콘텐츠 블록들을 구분선으로 분리) */
+.home-section { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+.home-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
 
 /* ------------------------------------------------------------

@@ -13,12 +13,13 @@ declare global {
 /**
  * 일반(반응형) 디스플레이 광고 영역.
  * - 고정 크기(예: 160x600) 대신 AdSense가 자동으로 크기를 잡는 반응형 광고 단위를 사용합니다.
- * - 슬롯이 설정되지 않았거나(개발 환경 등) 실제로 채워지는 광고가 없으면(공백/미체결) 자동으로 숨김 처리됩니다.
+ * - 광고가 실제로 채워지기 전(대기/미체결)에는 구분선·여백 없이 완전히 숨김 처리됩니다.
+ *   (감싸는 section 여백/구분선을 이 컴포넌트가 직접 들고 있다가, 채워졌을 때만 노출)
  * - 광고가 실제로 채워지면(data-ad-status="filled") 그때만 화면에 표시합니다.
  */
 export default function AdSlot({
   slot,
-  className,
+  className = 'ad-banner-wrap',
   maxWidth = 300,
 }: {
   slot?: string
@@ -58,25 +59,28 @@ export default function AdSlot({
     return () => observer.disconnect()
   }, [slot])
 
-  // 클라이언트/슬롯 미설정(로컬 개발, 승인 대기 중) 또는 미체결 광고는 아무것도 렌더링하지 않음
-  if (!ADSENSE_CLIENT || !slot || status === 'unfilled') {
+  // 클라이언트/슬롯 미설정(로컬 개발, 승인 대기 중)이면 완전히 렌더링하지 않음
+  if (!ADSENSE_CLIENT || !slot) {
     return null
   }
 
+  const filled = status === 'filled'
+
+  // 채워지기 전(pending/unfilled)에는 섹션 여백·구분선 없이 display:none으로 완전히 숨김.
+  // <ins> 태그 자체는 계속 DOM에 남겨둬야 애드센스 스크립트와 상태 감지(MutationObserver)가 정상 동작합니다.
   return (
-    <div
-      className={className}
-      style={{ width: '100%', maxWidth, margin: '0 auto', display: status === 'filled' ? 'block' : 'none' }}
-    >
-      <ins
-        ref={insRef}
-        className="adsbygoogle"
-        style={{ display: 'block' }}
-        data-ad-client={ADSENSE_CLIENT}
-        data-ad-slot={slot}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
+    <div className={filled ? 'home-section' : undefined} style={filled ? undefined : { display: 'none' }}>
+      <div className={className} style={{ width: '100%', maxWidth, margin: '0 auto' }}>
+        <ins
+          ref={insRef}
+          className="adsbygoogle"
+          style={{ display: 'block' }}
+          data-ad-client={ADSENSE_CLIENT}
+          data-ad-slot={slot}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        />
+      </div>
     </div>
   )
 }

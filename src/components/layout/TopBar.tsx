@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getUser, getProfile, logout } from '@/lib/auth-actions'
-import { getUnreadNotificationCount, getUnreadMessageCount } from '@/lib/queries'
+import { getUnreadNotificationCount, getUnreadMessageCount, getBoards } from '@/lib/queries'
+import HamburgerMenu from './HamburgerMenu'
 
 export default async function TopBar() {
   const user = await getUser()
@@ -8,11 +9,12 @@ export default async function TopBar() {
   const unreadNoti = user ? await getUnreadNotificationCount(user.id) : 0
   const unreadMsg = user ? await getUnreadMessageCount(user.id) : 0
   const bellCount = unreadNoti + unreadMsg
+  const boards = await getBoards()
 
   return (
     <div className="container">
       <div className="util-row">
-        <div className="icon-btn">☰</div>
+        <HamburgerMenu boards={boards} />
         <Link href="/" className="brand-logo">Community Portal</Link>
         <div className="right-icons">
           {user && profile ? (

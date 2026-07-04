@@ -112,7 +112,7 @@ ul { list-style: none; }
 .right-icons .nick { font-size: 0.84rem; color: var(--ink-soft); white-space: nowrap; }
 .right-icons .logout-btn { background: none; border: none; color: var(--ink-faint); font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
 
-.search-hero { order: 3; flex: 1 1 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding-bottom: 6px; }
+.search-hero { order: 3; flex: 1 1 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding-top: 10px; padding-bottom: 6px; }
 .search-mark {
   width: 38px; height: 38px; border-radius: 50%; background: var(--brand); color: #fff;
   display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0;

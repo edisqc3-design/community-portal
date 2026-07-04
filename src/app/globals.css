@@ -171,7 +171,7 @@ ul { list-style: none; }
    PC 텍스트 탭 네비게이션 (BoardNavTabs.tsx)
    ------------------------------------------------------------ */
 .nav-tabs { background: transparent; }
-.nav-tabs .inner { display: flex; align-items: center; gap: 22px; overflow: hidden; padding: 0 16px; background: var(--bg-panel); border-bottom: 1px solid var(--border); border-radius: 8px 8px 0 0; position: relative; white-space: nowrap; }
+.nav-tabs .inner { display: flex; align-items: center; gap: 22px; overflow: hidden; padding: 0 16px; position: relative; white-space: nowrap; }
 .nav-tabs a { padding: 13px 0; font-size: 0.88rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; border-bottom: 2px solid transparent; }
 .nav-tabs a.active { color: var(--brand); border-bottom-color: var(--brand); }
 .nav-tabs .more { margin-left: auto; font-size: 0.82rem; color: var(--ink-faint); flex-shrink: 0; cursor: pointer; user-select: none; padding: 13px 0; display: inline-block; }

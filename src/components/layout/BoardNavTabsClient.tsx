@@ -69,44 +69,46 @@ export default function BoardNavTabsClient({ boards }: Props) {
 
   return (
     <nav className="nav-tabs">
-      <div className="container inner" ref={containerRef}>
-        {/* 실제로 보여주는 탭 (측정된 개수만큼만) */}
-        {allItems.map((item, i) => {
-          const href = item.slug ? `/board/${item.slug}` : '/'
-          const isActive = item.slug ? pathname === href : pathname === '/'
-          const hidden = i >= visibleCount
-          return (
-            <Link
-              key={item.id}
-              href={href}
-              ref={el => { itemRefs.current[i] = el }}
-              className={isActive ? 'active' : ''}
-              style={hidden ? { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' } : undefined}
-            >
-              {item.name}
-            </Link>
-          )
-        })}
+      <div className="container">
+        <div className="inner" ref={containerRef}>
+          {/* 실제로 보여주는 탭 (측정된 개수만큼만) */}
+          {allItems.map((item, i) => {
+            const href = item.slug ? `/board/${item.slug}` : '/'
+            const isActive = item.slug ? pathname === href : pathname === '/'
+            const hidden = i >= visibleCount
+            return (
+              <Link
+                key={item.id}
+                href={href}
+                ref={el => { itemRefs.current[i] = el }}
+                className={isActive ? 'active' : ''}
+                style={hidden ? { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' } : undefined}
+              >
+                {item.name}
+              </Link>
+            )
+          })}
 
-        {hasOverflow && (
-          <div className="nav-more-wrap" ref={moreRef}>
-            <span className="more" role="button" onClick={() => setDropdownOpen(v => !v)}>
-              더보기 {dropdownOpen ? '⌃' : '⌄'}
-            </span>
-            {dropdownOpen && (
-              <div className="nav-more-dropdown">
-                {overflowItems.map(item => {
-                  const href = item.slug ? `/board/${item.slug}` : '/'
-                  return (
-                    <Link key={item.id} href={href} onClick={() => setDropdownOpen(false)}>
-                      {item.name}
-                    </Link>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
+          {hasOverflow && (
+            <div className="nav-more-wrap" ref={moreRef}>
+              <span className="more" role="button" onClick={() => setDropdownOpen(v => !v)}>
+                더보기 {dropdownOpen ? '⌃' : '⌄'}
+              </span>
+              {dropdownOpen && (
+                <div className="nav-more-dropdown">
+                  {overflowItems.map(item => {
+                    const href = item.slug ? `/board/${item.slug}` : '/'
+                    return (
+                      <Link key={item.id} href={href} onClick={() => setDropdownOpen(false)}>
+                        {item.name}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   )

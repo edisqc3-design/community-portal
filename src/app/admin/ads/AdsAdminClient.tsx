@@ -48,15 +48,20 @@ export default function AdsAdminClient({ initialAds }: { initialAds: SponsorAd[]
     formData.set('end_date', endDate)
     formData.set('image', file)
 
-    const result = await createSponsorAdAdmin(formData)
-    if (!result.success) {
-      setErrorMsg(result.error)
+    try {
+      const result = await createSponsorAdAdmin(formData)
+      if (!result.success) {
+        setErrorMsg(result.error)
+        setStatus('error')
+        return
+      }
+      resetForm()
+      setStatus('idle')
+      router.refresh()
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : '업로드 중 오류가 발생했습니다. (이미지 용량이 너무 크지 않은지 확인해주세요)')
       setStatus('error')
-      return
     }
-    resetForm()
-    setStatus('idle')
-    router.refresh()
   }
 
   const handleToggle = async (id: string, next: boolean) => {

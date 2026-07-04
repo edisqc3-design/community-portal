@@ -127,9 +127,12 @@ ul { list-style: none; }
   padding: 8px 18px; border-radius: 18px; cursor: pointer; font-size: 0.84rem; flex-shrink: 0;
 }
 
-/* PC에서도 검색창 폭만 고정하고, 로고/아이콘 줄 바로 아래에 검색창이 오도록 유지 */
+/* PC에서는 로고와 검색바를 한 줄로 배치하고, 서로 상단 끝을 정확히 맞춤 */
 @media (min-width: 769px) {
+  .header-row { flex-wrap: nowrap; }
+  .search-hero { order: 2; flex: 1 1 auto; padding-top: 0; padding-bottom: 0; }
   .search-hero form { max-width: 520px; }
+  .right-icons { order: 3; }
 }
 
 @media (max-width: 480px) {

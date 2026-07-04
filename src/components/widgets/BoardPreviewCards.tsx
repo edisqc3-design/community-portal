@@ -25,10 +25,11 @@ export default async function BoardPreviewCards() {
             <Link href={`/board/${board.slug}`} className="board-card-head">
               <span className="ic" style={{ background: boardBadgeColor(board.slug) }}>{boardIcon(board.slug)}</span>
               <b>{board.name}</b>
+              <span className="more">더보기 ›</span>
             </Link>
             <ul>
               {posts.length === 0 ? (
-                <li style={{ color: 'var(--ink-faint)' }}>아직 게시글이 없습니다</li>
+                <li className="board-card-empty">아직 게시글이 없습니다</li>
               ) : (
                 posts.map(post => (
                   <li key={post.id}>
@@ -37,7 +38,6 @@ export default async function BoardPreviewCards() {
                 ))
               )}
             </ul>
-            <Link href={`/board/${board.slug}`} className="more">더보기 ›</Link>
           </div>
         ))}
       </div>

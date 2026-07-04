@@ -46,6 +46,18 @@ export interface Comment {
   author?: Pick<Profile, 'id' | 'nickname' | 'avatar_url'> | null
 }
 
+export interface SponsorAd {
+  id: string
+  title: string
+  image_url: string
+  link_url: string
+  weight: number
+  is_active: boolean
+  start_date: string | null
+  end_date: string | null
+  created_at: string
+}
+
 export interface Notification {
   id: string
   user_id: string

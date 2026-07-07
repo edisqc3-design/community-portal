@@ -132,6 +132,13 @@ ul { list-style: none; }
   .search-hero form { max-width: 520px; }
 }
 
+/* 모바일 자동 확대(zoom) 방지: iOS Safari 등은 입력창 글자 크기가 16px 미만이면
+   탭 포커스 시 화면을 강제로 확대함. 모바일에서만 16px로 올려 확대를 막는다. */
+@media (max-width: 768px) {
+  .search-hero input,
+  .input-field { font-size: 16px; }
+}
+
 @media (max-width: 480px) {
   .brand-logo { font-size: 1rem; }
   .right-icons { gap: 6px; }
@@ -383,20 +390,13 @@ ul { list-style: none; }
    ------------------------------------------------------------ */
 .home-shell {
   display: grid;
-  grid-template-columns: 1fr; /* 모바일/태블릿 기본: 콘텐츠가 화면 폭에 맞춰짐 */
+  grid-template-columns: minmax(0, 1fr) 1080px minmax(0, 1fr);
+  column-gap: 24px;
   align-items: start;
 }
-.home-shell > .container { margin: 0 auto; width: 100%; max-width: 1080px; }
-.ad-rail { display: none; position: sticky; top: 84px; margin-top: 16px; }
-/* 광고 레일이 필요한 넓은 PC 화면에서만 3단(레일-콘텐츠-레일) 그리드로 전환 */
-@media (min-width: 1440px) {
-  .home-shell {
-    grid-template-columns: minmax(0, 1fr) 1080px minmax(0, 1fr);
-    column-gap: 24px;
-  }
-  .home-shell > .container { grid-column: 2; margin: 0; width: auto; max-width: none; }
-  .ad-rail { grid-column: 1; justify-self: end; display: block; }
-}
+.home-shell > .container { grid-column: 2; margin: 0; width: auto; max-width: none; }
+.ad-rail { grid-column: 1; justify-self: end; display: none; position: sticky; top: 84px; margin-top: 16px; }
+@media (min-width: 1440px) { .ad-rail { display: block; } }
 /* 스폰서 광고가 없어 내용이 비어있으면(:empty) 완전히 숨김 */
 .ad-rail:empty { display: none; }
 

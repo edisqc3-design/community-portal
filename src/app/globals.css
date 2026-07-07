@@ -390,7 +390,7 @@ ul { list-style: none; }
    ------------------------------------------------------------ */
 .home-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 1080px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) min(1080px, 100%) minmax(0, 1fr);
   column-gap: 24px;
   align-items: start;
 }

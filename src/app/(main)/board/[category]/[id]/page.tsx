@@ -63,7 +63,7 @@ export default async function PostDetailPage({
   const supabase = await createClient()
   const { data: commentsRaw } = await supabase
     .from('comments')
-    .select('id, post_id, author_id, content, parent_id, is_deleted, created_at, author:profiles(id, nickname, avatar_url)')
+    .select('id, post_id, author_id, content, parent_id, is_deleted, created_at, author:profiles!author_id(id, nickname, avatar_url)')
     .eq('post_id', id)
     .eq('is_deleted', false)
     .order('created_at', { ascending: true })

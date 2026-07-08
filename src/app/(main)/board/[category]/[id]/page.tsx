@@ -12,6 +12,10 @@ import LikeButton from './LikeButton'
 import BookmarkButton from './BookmarkButton'
 import ReportButton from '@/components/ui/ReportButton'
 
+// 새 글/수정/삭제가 즉시 반영되도록 이 페이지는 캐시하지 않고 매 요청마다 새로 조회합니다.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 function excerpt(html: string, len = 120) {
   const clean = htmlToPlainText(html)
   return clean.length > len ? `${clean.slice(0, len)}…` : clean

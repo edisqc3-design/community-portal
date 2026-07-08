@@ -34,9 +34,7 @@ export default async function HomePage() {
 
             {carouselSections.length > 0 && (
               <div className="home-section">
-                {carouselSections.map(section => (
-                  <HomeCarousel key={section.id} section={section} />
-                ))}
+                <HomeCarousel sections={carouselSections} />
               </div>
             )}
 

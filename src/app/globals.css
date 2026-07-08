@@ -599,7 +599,10 @@ ul { list-style: none; }
 .editor-content h2 { font-size: 1.25rem; margin: 22px 0 10px; }
 .editor-content h3 { font-size: 1.08rem; margin: 18px 0 8px; }
 .editor-content p { margin: 0 0 12px; }
-.editor-content ul, .editor-content ol { margin: 0 0 12px; padding-left: 1.4em; }
+.editor-content ul { margin: 0 0 12px; padding-left: 1.4em; list-style-type: disc; }
+.editor-content ol { margin: 0 0 12px; padding-left: 1.4em; list-style-type: decimal; }
+.editor-content ul ul { list-style-type: circle; }
+.editor-content ul ul ul { list-style-type: square; }
 .editor-content li { margin-bottom: 4px; }
 .editor-content blockquote {
   margin: 0 0 12px; padding: 10px 16px; border-left: 3px solid var(--brand);

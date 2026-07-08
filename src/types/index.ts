@@ -30,9 +30,29 @@ export interface Post {
   is_deleted: boolean
   created_at: string
   updated_at: string
+  // 관리자가 캐러셀 카드용으로 수동 지정한 썸네일 (없으면 본문 첫 이미지를 자동 사용)
+  thumbnail_url?: string | null
   // 조인 결과 (queries.ts에서 select 시 채워짐)
   author?: Pick<Profile, 'id' | 'nickname' | 'avatar_url'> | null
   board?: Pick<Board, 'id' | 'slug' | 'name'> | null
+}
+
+// 홈 화면 캐러셀 섹션 (네이버 메인 스타일 가로 스크롤 카드) 설정
+export interface CarouselSection {
+  id: string
+  title: string
+  board_id: string
+  sort_type: 'latest' | 'views'
+  item_count: number
+  display_order: number
+  is_active: boolean
+  created_at?: string
+  board?: Pick<Board, 'slug' | 'name'> | null
+}
+
+// 홈 화면에 렌더링할 캐러셀 섹션 + 실제 게시글(썸네일 확정본) 묶음
+export interface CarouselSectionWithPosts extends CarouselSection {
+  posts: (Post & { resolvedThumbnail: string | null })[]
 }
 
 export interface Comment {

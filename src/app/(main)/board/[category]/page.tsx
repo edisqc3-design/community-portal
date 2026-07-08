@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getBoardBySlug, getPostsByBoard } from '@/lib/queries'
 
+// 새 글/수정/삭제가 즉시 반영되도록 이 페이지는 캐시하지 않고 매 요청마다 새로 조회합니다.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const PAGE_SIZE = 20
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {

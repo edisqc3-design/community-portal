@@ -78,11 +78,20 @@ export async function getNoticePosts(limit = 5): Promise<Post[]> {
 // 게시판별 최신글 미리보기
 export async function getBoardPreview(boardSlug: string, limit = 5): Promise<Post[]> {
   const supabase = await createClient()
+
+  const { data: board } = await supabase
+    .from('boards')
+    .select('id')
+    .eq('slug', boardSlug)
+    .single()
+
+  if (!board) return []
+
   const { data, error } = await supabase
     .from('posts')
     .select(POST_SELECT)
     .eq('is_deleted', false)
-    .eq('board.slug', boardSlug)
+    .eq('board_id', board.id)
     .order('created_at', { ascending: false })
     .limit(limit)
 

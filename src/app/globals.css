@@ -508,10 +508,23 @@ ul { list-style: none; }
 }
 .rte-editor:focus { box-shadow: inset 0 0 0 2px var(--brand-pale); }
 
-.rte-placeholder {
-  position: absolute; top: 14px; left: 16px; color: var(--ink-faint);
-  font-size: 0.92rem; pointer-events: none; user-select: none;
+.rte-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left; height: 0; pointer-events: none;
+  color: var(--ink-faint);
 }
+
+/* 이미지 리사이즈 */
+.rte-img-wrap { position: relative; display: inline-block; max-width: 100%; line-height: 0; vertical-align: bottom; }
+.rte-img-wrap.is-selected { outline: 2px solid var(--brand); border-radius: 8px; }
+.rte-img-resize-handle {
+  position: absolute; right: -6px; bottom: -6px; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--brand); border: 2px solid var(--white);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3); cursor: nwse-resize;
+  opacity: 0; transition: opacity 0.15s; touch-action: none;
+}
+.rte-img-wrap:hover .rte-img-resize-handle,
+.rte-img-wrap.is-selected .rte-img-resize-handle { opacity: 1; }
 
 .rte-link-popover {
   position: absolute; z-index: 20; top: 44px; left: 8px;

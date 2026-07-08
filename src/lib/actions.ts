@@ -1,8 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 import { getKstDateString } from '@/lib/date-utils'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 type ActionResult<T = undefined> = { success: true; data: T } | { success: false; error: string }
 
@@ -19,7 +21,8 @@ export async function createPost(payload: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: '로그인이 필요합니다.' }
 
-  if (!payload.title.trim() || !payload.content.trim()) {
+  const plainContent = payload.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim()
+  if (!payload.title.trim() || (!plainContent && !/<img[\s>]/i.test(payload.content))) {
     return { success: false, error: '제목과 내용을 입력해 주세요.' }
   }
 
@@ -29,7 +32,7 @@ export async function createPost(payload: {
       board_id: payload.boardId,
       author_id: user.id,
       title: payload.title.trim(),
-      content: payload.content,
+      content: sanitizeHtml(payload.content),
     })
     .select('id')
     .single()
@@ -46,7 +49,7 @@ export async function updatePost(
   const supabase = await createClient()
   const { error } = await supabase
     .from('posts')
-    .update({ title: payload.title.trim(), content: payload.content })
+    .update({ title: payload.title.trim(), content: sanitizeHtml(payload.content) })
     .eq('id', id)
 
   if (error) return { success: false, error: error.message }
@@ -250,4 +253,71 @@ export async function markMessageRead(id: string): Promise<ActionResult> {
   const { error } = await supabase.from('messages').update({ is_read: true }).eq('id', id)
   if (error) return { success: false, error: error.message }
   return { success: true, data: undefined }
+}
+
+// ------------------------------------------------------------
+// 에디터 첨부(이미지/파일) 업로드
+// 로그인한 사용자만 업로드할 수 있으며, RLS 정책과 무관하게 동작하도록
+// service_role 기반 admin 클라이언트로 스토리지에 업로드합니다.
+// ------------------------------------------------------------
+const EDITOR_IMAGE_BUCKET = 'post-images'
+const EDITOR_FILE_BUCKET = 'post-attachments'
+const MAX_IMAGE_SIZE = 8 * 1024 * 1024 // 8MB
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+
+function safeFileName(name: string) {
+  const ext = (name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin'
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+}
+
+export async function uploadEditorImage(
+  formData: FormData
+): Promise<ActionResult<{ url: string }>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: '로그인이 필요합니다.' }
+
+  const file = formData.get('file')
+  if (!(file instanceof File)) return { success: false, error: '파일이 없습니다.' }
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    return { success: false, error: '지원하지 않는 이미지 형식입니다. (jpg, png, gif, webp, svg)' }
+  }
+  if (file.size > MAX_IMAGE_SIZE) {
+    return { success: false, error: '이미지 용량은 8MB를 초과할 수 없습니다.' }
+  }
+
+  const admin = createAdminClient()
+  const path = `${user.id}/${safeFileName(file.name)}`
+  const { error: uploadError } = await admin.storage
+    .from(EDITOR_IMAGE_BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false })
+  if (uploadError) return { success: false, error: `이미지 업로드 실패: ${uploadError.message}` }
+
+  const { data } = admin.storage.from(EDITOR_IMAGE_BUCKET).getPublicUrl(path)
+  return { success: true, data: { url: data.publicUrl } }
+}
+
+export async function uploadEditorFile(
+  formData: FormData
+): Promise<ActionResult<{ url: string; name: string; size: number }>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: '로그인이 필요합니다.' }
+
+  const file = formData.get('file')
+  if (!(file instanceof File)) return { success: false, error: '파일이 없습니다.' }
+  if (file.size > MAX_FILE_SIZE) {
+    return { success: false, error: '파일 용량은 20MB를 초과할 수 없습니다.' }
+  }
+
+  const admin = createAdminClient()
+  const path = `${user.id}/${safeFileName(file.name)}`
+  const { error: uploadError } = await admin.storage
+    .from(EDITOR_FILE_BUCKET)
+    .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false })
+  if (uploadError) return { success: false, error: `파일 업로드 실패: ${uploadError.message}` }
+
+  const { data } = admin.storage.from(EDITOR_FILE_BUCKET).getPublicUrl(path)
+  return { success: true, data: { url: data.publicUrl, name: file.name, size: file.size } }
 }

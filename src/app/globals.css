@@ -411,6 +411,15 @@ ul { list-style: none; }
 /* 스폰서 광고가 없어 내용이 비어있으면(:empty) 완전히 숨김 */
 .ad-rail:empty { display: none; }
 
+/* 광고 레일이 보이지 않는 화면(1440px 미만)에서는 3단 그리드 자체를 끄고
+   .container를 일반 중앙 정렬(max-width:1080px)로 되돌려, 검색바/탭바와
+   동일한 폭·정렬을 갖도록 함. 그리드를 켜둔 채로 두면 빈 좌우 트랙 사이의
+   column-gap(24px×2)이 본문 컬럼을 오른쪽으로 밀고 폭을 줄이는 문제가 있었음. */
+@media (max-width: 1439.98px) {
+  .home-shell { display: block; }
+  .home-shell > .container { grid-column: unset; margin: 0 auto; width: auto; max-width: 1080px; }
+}
+
 /* 홈 화면 섹션 구분선 (배너 아래 콘텐츠 블록들을 구분선으로 분리) */
 .home-section { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
 .home-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }

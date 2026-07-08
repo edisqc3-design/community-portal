@@ -274,50 +274,60 @@ function safeFileName(name: string) {
 export async function uploadEditorImage(
   formData: FormData
 ): Promise<ActionResult<{ url: string }>> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: '로그인이 필요합니다.' }
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: '로그인이 필요합니다.' }
 
-  const file = formData.get('file')
-  if (!(file instanceof File)) return { success: false, error: '파일이 없습니다.' }
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return { success: false, error: '지원하지 않는 이미지 형식입니다. (jpg, png, gif, webp, svg)' }
+    const file = formData.get('file')
+    if (!(file instanceof File)) return { success: false, error: '파일이 없습니다.' }
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return { success: false, error: '지원하지 않는 이미지 형식입니다. (jpg, png, gif, webp, svg)' }
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      return { success: false, error: '이미지 용량은 8MB를 초과할 수 없습니다.' }
+    }
+
+    const admin = createAdminClient()
+    const path = `${user.id}/${safeFileName(file.name)}`
+    const { error: uploadError } = await admin.storage
+      .from(EDITOR_IMAGE_BUCKET)
+      .upload(path, file, { contentType: file.type, upsert: false })
+    if (uploadError) return { success: false, error: `이미지 업로드 실패: ${uploadError.message}` }
+
+    const { data } = admin.storage.from(EDITOR_IMAGE_BUCKET).getPublicUrl(path)
+    return { success: true, data: { url: data.publicUrl } }
+  } catch (err) {
+    console.error('uploadEditorImage error:', err)
+    return { success: false, error: `서버 오류: ${err instanceof Error ? err.message : String(err)}` }
   }
-  if (file.size > MAX_IMAGE_SIZE) {
-    return { success: false, error: '이미지 용량은 8MB를 초과할 수 없습니다.' }
-  }
-
-  const admin = createAdminClient()
-  const path = `${user.id}/${safeFileName(file.name)}`
-  const { error: uploadError } = await admin.storage
-    .from(EDITOR_IMAGE_BUCKET)
-    .upload(path, file, { contentType: file.type, upsert: false })
-  if (uploadError) return { success: false, error: `이미지 업로드 실패: ${uploadError.message}` }
-
-  const { data } = admin.storage.from(EDITOR_IMAGE_BUCKET).getPublicUrl(path)
-  return { success: true, data: { url: data.publicUrl } }
 }
 
 export async function uploadEditorFile(
   formData: FormData
 ): Promise<ActionResult<{ url: string; name: string; size: number }>> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: '로그인이 필요합니다.' }
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: '로그인이 필요합니다.' }
 
-  const file = formData.get('file')
-  if (!(file instanceof File)) return { success: false, error: '파일이 없습니다.' }
-  if (file.size > MAX_FILE_SIZE) {
-    return { success: false, error: '파일 용량은 20MB를 초과할 수 없습니다.' }
+    const file = formData.get('file')
+    if (!(file instanceof File)) return { success: false, error: '파일이 없습니다.' }
+    if (file.size > MAX_FILE_SIZE) {
+      return { success: false, error: '파일 용량은 20MB를 초과할 수 없습니다.' }
+    }
+
+    const admin = createAdminClient()
+    const path = `${user.id}/${safeFileName(file.name)}`
+    const { error: uploadError } = await admin.storage
+      .from(EDITOR_FILE_BUCKET)
+      .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false })
+    if (uploadError) return { success: false, error: `파일 업로드 실패: ${uploadError.message}` }
+
+    const { data } = admin.storage.from(EDITOR_FILE_BUCKET).getPublicUrl(path)
+    return { success: true, data: { url: data.publicUrl, name: file.name, size: file.size } }
+  } catch (err) {
+    console.error('uploadEditorFile error:', err)
+    return { success: false, error: `서버 오류: ${err instanceof Error ? err.message : String(err)}` }
   }
-
-  const admin = createAdminClient()
-  const path = `${user.id}/${safeFileName(file.name)}`
-  const { error: uploadError } = await admin.storage
-    .from(EDITOR_FILE_BUCKET)
-    .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false })
-  if (uploadError) return { success: false, error: `파일 업로드 실패: ${uploadError.message}` }
-
-  const { data } = admin.storage.from(EDITOR_FILE_BUCKET).getPublicUrl(path)
-  return { success: true, data: { url: data.publicUrl, name: file.name, size: file.size } }
 }

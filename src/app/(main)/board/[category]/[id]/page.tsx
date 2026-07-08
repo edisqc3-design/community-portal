@@ -5,14 +5,15 @@ import { createClient } from '@/lib/supabase-server'
 import { getPostById } from '@/lib/queries'
 import { incrementViewCount } from '@/lib/actions'
 import { SITE_URL, SITE_NAME } from '@/lib/site-config'
+import { htmlToPlainText } from '@/lib/sanitize'
 import type { Comment } from '@/types'
 import CommentSection from './CommentSection'
 import LikeButton from './LikeButton'
 import BookmarkButton from './BookmarkButton'
 import ReportButton from '@/components/ui/ReportButton'
 
-function excerpt(text: string, len = 120) {
-  const clean = text.replace(/\s+/g, ' ').trim()
+function excerpt(html: string, len = 120) {
+  const clean = htmlToPlainText(html)
   return clean.length > len ? `${clean.slice(0, len)}…` : clean
 }
 
@@ -124,7 +125,7 @@ export default async function PostDetailPage({
           <span>조회 {post.view_count}</span>
         </div>
 
-        <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.8, minHeight: '120px' }}>{post.content}</div>
+        <div className="editor-content" style={{ minHeight: '120px' }} dangerouslySetInnerHTML={{ __html: post.content }} />
 
         <div style={{ marginTop: '24px', display: 'flex', gap: '10px', alignItems: 'center' }}>
           <LikeButton postId={post.id} initialLiked={liked} initialCount={post.like_count} />

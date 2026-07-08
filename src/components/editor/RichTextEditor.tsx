@@ -108,6 +108,9 @@ export default function RichTextEditor({
       } else {
         setUploadError(result.error)
       }
+    } catch (err) {
+      console.error('이미지 업로드 중 오류:', err)
+      setUploadError(err instanceof Error ? `이미지 업로드 실패: ${err.message}` : '이미지 업로드 중 알 수 없는 오류가 발생했습니다.')
     } finally {
       setUploading(null)
     }
@@ -131,6 +134,9 @@ export default function RichTextEditor({
       } else {
         setUploadError(result.error)
       }
+    } catch (err) {
+      console.error('파일 업로드 중 오류:', err)
+      setUploadError(err instanceof Error ? `파일 업로드 실패: ${err.message}` : '파일 업로드 중 알 수 없는 오류가 발생했습니다.')
     } finally {
       setUploading(null)
     }

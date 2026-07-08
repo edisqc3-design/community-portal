@@ -1,148 +1,99 @@
-import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase-server'
-import { getPostById } from '@/lib/queries'
-import { incrementViewCount } from '@/lib/actions'
-import { SITE_URL, SITE_NAME } from '@/lib/site-config'
-import { htmlToPlainText } from '@/lib/sanitize'
-import type { Comment } from '@/types'
-import CommentSection from './CommentSection'
-import LikeButton from './LikeButton'
-import BookmarkButton from './BookmarkButton'
-import ReportButton from '@/components/ui/ReportButton'
+import { getBoardBySlug, getPostsByBoard } from '@/lib/queries'
 
 // 새 글/수정/삭제가 즉시 반영되도록 이 페이지는 캐시하지 않고 매 요청마다 새로 조회합니다.
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-function excerpt(html: string, len = 120) {
-  const clean = htmlToPlainText(html)
-  return clean.length > len ? `${clean.slice(0, len)}…` : clean
-}
+const PAGE_SIZE = 20
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ category: string; id: string }>
-}): Promise<Metadata> {
-  const { category, id } = await params
-  const post = await getPostById(id)
-  if (!post || post.board?.slug !== category) return { title: '게시글을 찾을 수 없습니다' }
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
+  const { category } = await params
+  const board = await getBoardBySlug(category)
+  if (!board) return { title: '게시판을 찾을 수 없습니다' }
 
-  const description = excerpt(post.content)
-  const url = `/board/${category}/${id}`
+  const title = board.name
+  const description = board.description ?? `${board.name} 게시판의 최신 글을 확인해보세요.`
 
   return {
-    title: post.title,
+    title,
     description,
-    alternates: { canonical: url },
-    openGraph: {
-      type: 'article',
-      title: post.title,
-      description,
-      url,
-      publishedTime: post.created_at,
-      modifiedTime: post.updated_at,
-    },
-    twitter: { card: 'summary', title: post.title, description },
+    alternates: { canonical: `/board/${board.slug}` },
+    openGraph: { title, description, url: `/board/${board.slug}` },
   }
 }
 
-export default async function PostDetailPage({
+export default async function BoardListPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{ category: string; id: string }>
+  params: Promise<{ category: string }>
+  searchParams: Promise<{ page?: string }>
 }) {
-  const { category, id } = await params
-  const post = await getPostById(id)
-  if (!post || post.board?.slug !== category) notFound()
+  const { category } = await params
+  const { page: pageParam } = await searchParams
+  const page = Math.max(1, Number(pageParam) || 1)
 
-  incrementViewCount(id) // fire-and-forget
+  const board = await getBoardBySlug(category)
+  if (!board) notFound()
 
-  const supabase = await createClient()
-  const { data: commentsRaw } = await supabase
-    .from('comments')
-    .select('id, post_id, author_id, content, parent_id, is_deleted, created_at, author:profiles!author_id(id, nickname, avatar_url)')
-    .eq('post_id', id)
-    .eq('is_deleted', false)
-    .order('created_at', { ascending: true })
-
-  const comments = (commentsRaw as unknown as Comment[] | null)
-
-  const { data: { user } } = await supabase.auth.getUser()
-  let liked = false
-  let bookmarked = false
-  if (user) {
-    const { data: likeRow } = await supabase
-      .from('post_likes')
-      .select('post_id')
-      .eq('post_id', id)
-      .eq('user_id', user.id)
-      .maybeSingle()
-    liked = !!likeRow
-
-    const { data: bookmarkRow } = await supabase
-      .from('post_bookmarks')
-      .select('post_id')
-      .eq('post_id', id)
-      .eq('user_id', user.id)
-      .maybeSingle()
-    bookmarked = !!bookmarkRow
-  }
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'DiscussionForumPosting',
-    headline: post.title,
-    text: excerpt(post.content, 300),
-    datePublished: post.created_at,
-    dateModified: post.updated_at,
-    url: `${SITE_URL}/board/${category}/${id}`,
-    author: { '@type': 'Person', name: post.author?.nickname ?? '탈퇴한 회원' },
-    publisher: { '@type': 'Organization', name: SITE_NAME },
-    interactionStatistic: [
-      { '@type': 'InteractionCounter', interactionType: 'https://schema.org/LikeAction', userInteractionCount: post.like_count },
-      { '@type': 'InteractionCounter', interactionType: 'https://schema.org/CommentAction', userInteractionCount: post.comment_count },
-      { '@type': 'InteractionCounter', interactionType: 'https://schema.org/ViewAction', userInteractionCount: post.view_count },
-    ],
-  }
+  const { posts, total } = await getPostsByBoard(board.id, page, PAGE_SIZE)
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   return (
-    <div className="container" style={{ paddingTop: '28px', paddingBottom: '48px', maxWidth: '760px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <nav aria-label="breadcrumb" style={{ fontSize: '0.78rem', color: 'var(--ink-faint)', marginBottom: '10px' }}>
-        <Link href="/">홈</Link> <span>›</span> <Link href={`/board/${category}`}>{post.board?.name}</Link> <span>›</span> <span style={{ color: 'var(--ink-soft)' }}>{post.title}</span>
-      </nav>
-      <Link href={`/board/${category}`} style={{ fontSize: '0.85rem', color: 'var(--ink-faint)' }}>← {post.board?.name} 목록으로</Link>
-
-      <div style={{ background: 'var(--paper)', borderRadius: '10px', padding: 'clamp(18px, 5vw, 32px)', boxShadow: '0 4px 16px var(--paper-shadow)', marginTop: '14px' }}>
-        <h1 style={{ fontSize: '1.4rem', marginBottom: '10px' }}>
-          {post.is_notice && <span className="notice-tag">공지</span>}
-          {post.title}
-        </h1>
-        <div className="pin-card__meta" style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
-          <span>{post.author?.nickname ?? '탈퇴한 회원'}</span>
-          <span>·</span>
-          <span>{new Date(post.created_at).toLocaleString('ko-KR')}</span>
-          <span>·</span>
-          <span>조회 {post.view_count}</span>
+    <div className="container" style={{ paddingTop: '28px', paddingBottom: '48px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.5rem' }}>{board.name}</h1>
+          {board.description && <p style={{ color: 'var(--ink-faint)', fontSize: '0.88rem', marginTop: '4px' }}>{board.description}</p>}
         </div>
-
-        <div className="editor-content" style={{ minHeight: '120px' }} dangerouslySetInnerHTML={{ __html: post.content }} />
-
-        <div style={{ marginTop: '24px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <LikeButton postId={post.id} initialLiked={liked} initialCount={post.like_count} />
-          <BookmarkButton postId={post.id} initialBookmarked={bookmarked} />
-          <span style={{ marginLeft: 'auto' }}>
-            <ReportButton targetType="post" targetId={post.id} />
-          </span>
-        </div>
+        <Link href={`/board/${board.slug}/write`} className="btn-primary">✏️ 글쓰기</Link>
       </div>
 
-      <div className="thread-divider" />
+      <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
+        {posts.length === 0 ? (
+          <p style={{ padding: '48px 20px', textAlign: 'center', color: 'var(--ink-faint)' }}>아직 게시글이 없습니다. 첫 글을 남겨보세요!</p>
+        ) : (
+          posts.map(post => (
+            <Link
+              key={post.id}
+              href={`/board/${board.slug}/${post.id}`}
+              style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '14px 20px', borderBottom: '1px solid var(--border)' }}
+            >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {post.is_notice && <span className="notice-tag">공지</span>}
+                {post.title}
+                {post.comment_count > 0 && <span style={{ color: 'var(--pin-red)', fontWeight: 700 }}> [{post.comment_count}]</span>}
+              </span>
+              <span style={{ display: 'flex', gap: '10px', fontSize: '0.8rem', color: 'var(--ink-faint)', flexShrink: 0 }}>
+                <span>{post.author?.nickname ?? '탈퇴한 회원'}</span>
+                <span>조회 {post.view_count}</span>
+              </span>
+            </Link>
+          ))
+        )}
+      </div>
 
-      <CommentSection postId={post.id} initialComments={comments ?? []} currentUserId={user?.id ?? null} />
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px' }}>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+            <Link
+              key={p}
+              href={`/board/${board.slug}?page=${p}`}
+              style={{
+                padding: '6px 12px', borderRadius: '6px', fontSize: '0.85rem',
+                background: p === page ? 'var(--ink)' : 'transparent',
+                color: p === page ? 'var(--paper)' : 'var(--ink-soft)',
+                border: '1px solid var(--border)',
+              }}
+            >
+              {p}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

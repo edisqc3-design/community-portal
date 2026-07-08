@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-server'
-import type { Board, Post, SponsorAd } from '@/types'
+import type { Board, Post, SponsorAd, CarouselSection, CarouselSectionWithPosts } from '@/types'
 import { getKstDateString } from '@/lib/date-utils'
+import { resolveThumbnail } from '@/lib/carousel-utils'
 
 const POST_SELECT = `
   id, board_id, author_id, title, content, view_count, like_count, comment_count,
@@ -303,4 +304,50 @@ export async function getActiveSponsorAd(): Promise<SponsorAd | null> {
     if (roll <= 0) return ad
   }
   return candidates[candidates.length - 1]
+}
+
+// ------------------------------------------------------------
+// 홈 캐러셀 (네이버 메인 스타일 가로 스크롤 카드 섹션)
+// 관리자가 /admin/carousel 에서 등록한 섹션마다, 연결된 게시판의 글을
+// 정렬 기준(최신순/조회수순)에 따라 뽑아와 카드로 보여줍니다.
+// ------------------------------------------------------------
+export async function getActiveCarouselSections(): Promise<CarouselSectionWithPosts[]> {
+  const supabase = await createClient()
+
+  const { data: sections, error } = await supabase
+    .from('carousel_sections')
+    .select('id, title, board_id, sort_type, item_count, display_order, is_active, board:boards(slug, name)')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+
+  if (error || !sections) {
+    if (error) console.error('getActiveCarouselSections error:', error.message)
+    return []
+  }
+
+  const withPosts = await Promise.all(
+    (sections as unknown as CarouselSection[]).map(async (section) => {
+      const { data: posts, error: postsError } = await supabase
+        .from('posts')
+        .select(`${POST_SELECT}, thumbnail_url`)
+        .eq('is_deleted', false)
+        .eq('board_id', section.board_id)
+        .order(section.sort_type === 'views' ? 'view_count' : 'created_at', { ascending: false })
+        .limit(section.item_count)
+
+      if (postsError) {
+        console.error('getActiveCarouselSections posts error:', postsError.message)
+      }
+
+      const items = ((posts as unknown as Post[]) ?? []).map(post => ({
+        ...post,
+        resolvedThumbnail: resolveThumbnail(post),
+      }))
+
+      return { ...section, posts: items }
+    })
+  )
+
+  // 글이 하나도 없는 섹션은 홈 화면에서 숨김
+  return withPosts.filter(section => section.posts.length > 0)
 }

@@ -2,11 +2,12 @@
 
 import { requireAdmin } from '@/lib/auth-actions'
 import { createAdminClient } from '@/lib/supabase-admin'
+import { getCarouselSectionPostsAdmin } from '@/lib/admin-queries'
 import { revalidatePath } from 'next/cache'
 
 type ActionResult<T = undefined> = { success: true; data: T } | { success: false; error: string }
 
-async function assertAdmin(): Promise<ActionResult | null> {
+async function assertAdmin(): Promise<{ success: false; error: string } | null> {
   const admin = await requireAdmin()
   if (!admin) return { success: false, error: '관리자만 이용할 수 있습니다.' }
   return null
@@ -153,6 +154,110 @@ export async function deleteSponsorAdAdmin(id: string): Promise<ActionResult> {
   revalidatePath('/admin/ads')
   revalidatePath('/')
   return { success: true, data: undefined }
+}
+
+// ------------------------------------------------------------
+// 홈 캐러셀 관리 (네이버 메인 스타일 가로 스크롤 카드 섹션)
+// ------------------------------------------------------------
+type CarouselSectionPayload = {
+  title: string
+  boardId: string
+  sortType: 'latest' | 'views'
+  itemCount: number
+  displayOrder: number
+}
+
+export async function createCarouselSectionAdmin(payload: CarouselSectionPayload): Promise<ActionResult> {
+  const denied = await assertAdmin()
+  if (denied) return denied
+
+  if (!payload.title.trim() || !payload.boardId) return { success: false, error: '제목과 게시판은 필수입니다.' }
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('carousel_sections').insert({
+    title: payload.title.trim(),
+    board_id: payload.boardId,
+    sort_type: payload.sortType,
+    item_count: payload.itemCount,
+    display_order: payload.displayOrder,
+  })
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin/carousel')
+  revalidatePath('/')
+  return { success: true, data: undefined }
+}
+
+export async function updateCarouselSectionAdmin(id: string, payload: CarouselSectionPayload): Promise<ActionResult> {
+  const denied = await assertAdmin()
+  if (denied) return denied
+
+  if (!payload.title.trim() || !payload.boardId) return { success: false, error: '제목과 게시판은 필수입니다.' }
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('carousel_sections')
+    .update({
+      title: payload.title.trim(),
+      board_id: payload.boardId,
+      sort_type: payload.sortType,
+      item_count: payload.itemCount,
+      display_order: payload.displayOrder,
+    })
+    .eq('id', id)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin/carousel')
+  revalidatePath('/')
+  return { success: true, data: undefined }
+}
+
+export async function toggleCarouselSectionActiveAdmin(id: string, isActive: boolean): Promise<ActionResult> {
+  const denied = await assertAdmin()
+  if (denied) return denied
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('carousel_sections').update({ is_active: isActive }).eq('id', id)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin/carousel')
+  revalidatePath('/')
+  return { success: true, data: undefined }
+}
+
+export async function deleteCarouselSectionAdmin(id: string): Promise<ActionResult> {
+  const denied = await assertAdmin()
+  if (denied) return denied
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('carousel_sections').delete().eq('id', id)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin/carousel')
+  revalidatePath('/')
+  return { success: true, data: undefined }
+}
+
+// 캐러셀 카드 썸네일 수동 지정 (비우면 본문 첫 이미지로 자동 복귀)
+export async function setPostThumbnailAdmin(postId: string, thumbnailUrl: string | null): Promise<ActionResult> {
+  const denied = await assertAdmin()
+  if (denied) return denied
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('posts').update({ thumbnail_url: thumbnailUrl }).eq('id', postId)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin/carousel')
+  revalidatePath('/')
+  return { success: true, data: undefined }
+}
+
+// 특정 섹션이 실제로 노출할 게시글 미리보기 (클라이언트 컴포넌트에서 호출하기 위한 서버 액션 래퍼)
+export async function fetchCarouselPreviewPostsAdmin(
+  boardId: string,
+  sortType: 'latest' | 'views',
+  limit: number
+): Promise<{ success: true; data: Awaited<ReturnType<typeof getCarouselSectionPostsAdmin>> } | { success: false; error: string }> {
+  const denied = await assertAdmin()
+  if (denied) return { success: false, error: denied.error }
+
+  const posts = await getCarouselSectionPostsAdmin(boardId, sortType, limit)
+  return { success: true, data: posts }
 }
 
 // ------------------------------------------------------------

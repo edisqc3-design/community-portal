@@ -62,6 +62,31 @@ export async function getAllSponsorAdsAdmin() {
   return data ?? []
 }
 
+// ------------------------------------------------------------
+// 홈 캐러셀 관리
+// ------------------------------------------------------------
+export async function getAllCarouselSectionsAdmin() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('carousel_sections')
+    .select('id, title, board_id, sort_type, item_count, display_order, is_active, created_at, board:boards(name, slug)')
+    .order('display_order', { ascending: true })
+  return data ?? []
+}
+
+// 특정 섹션이 실제로 홈 화면에 노출할 게시글 목록 (썸네일 교체 UI용 미리보기)
+export async function getCarouselSectionPostsAdmin(boardId: string, sortType: 'latest' | 'views', limit: number) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('posts')
+    .select('id, title, content, thumbnail_url, view_count, created_at')
+    .eq('board_id', boardId)
+    .eq('is_deleted', false)
+    .order(sortType === 'views' ? 'view_count' : 'created_at', { ascending: false })
+    .limit(limit)
+  return data ?? []
+}
+
 export async function getAllUsersAdmin() {
   const supabase = await createClient()
   const { data } = await supabase

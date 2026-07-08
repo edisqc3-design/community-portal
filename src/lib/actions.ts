@@ -39,6 +39,8 @@ export async function createPost(payload: {
 
   if (error) return { success: false, error: error.message }
   revalidatePath('/')
+  revalidatePath('/board/[category]', 'page')
+  revalidatePath('/board/[category]/[id]', 'page')
   return { success: true, data }
 }
 
@@ -54,6 +56,8 @@ export async function updatePost(
 
   if (error) return { success: false, error: error.message }
   revalidatePath('/')
+  revalidatePath('/board/[category]', 'page')
+  revalidatePath('/board/[category]/[id]', 'page')
   return { success: true, data: undefined }
 }
 
@@ -62,6 +66,8 @@ export async function deletePost(id: string): Promise<ActionResult> {
   const { error } = await supabase.from('posts').update({ is_deleted: true }).eq('id', id)
   if (error) return { success: false, error: error.message }
   revalidatePath('/')
+  revalidatePath('/board/[category]', 'page')
+  revalidatePath('/board/[category]/[id]', 'page')
   return { success: true, data: undefined }
 }
 

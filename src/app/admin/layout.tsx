@@ -42,6 +42,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin" className="title">⚙️ 관리자</Link>
           <Link href="/admin">대시보드</Link>
           <Link href="/admin/boards">게시판 관리</Link>
+          <Link href="/admin/carousel">홈 캐러셀 관리</Link>
           <Link href="/admin/posts">게시글 관리</Link>
           <Link href="/admin/reports">신고 관리</Link>
           <Link href="/admin/users">회원 관리</Link>

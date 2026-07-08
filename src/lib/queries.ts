@@ -5,7 +5,7 @@ import { getKstDateString } from '@/lib/date-utils'
 const POST_SELECT = `
   id, board_id, author_id, title, content, view_count, like_count, comment_count,
   is_notice, is_deleted, created_at, updated_at,
-  author:profiles(id, nickname, avatar_url),
+  author:profiles!author_id(id, nickname, avatar_url),
   board:boards(id, slug, name)
 `
 
@@ -166,7 +166,7 @@ export async function getRecentComments(limit = 5) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('comments')
-    .select('id, post_id, content, created_at, author:profiles(id, nickname), post:posts(id, board:boards(slug))')
+    .select('id, post_id, content, created_at, author:profiles!author_id(id, nickname), post:posts(id, board:boards(slug))')
     .eq('is_deleted', false)
     .order('created_at', { ascending: false })
     .limit(limit)

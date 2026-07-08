@@ -34,7 +34,7 @@ export async function getAllPostsAdmin(limit = 30) {
   const supabase = await createClient()
   const { data } = await supabase
     .from('posts')
-    .select('id, title, view_count, like_count, comment_count, is_notice, is_deleted, created_at, author:profiles(nickname), board:boards(name, slug)')
+    .select('id, title, view_count, like_count, comment_count, is_notice, is_deleted, created_at, author:profiles!author_id(nickname), board:boards(name, slug)')
     .order('created_at', { ascending: false })
     .limit(limit)
   return data ?? []
@@ -44,7 +44,7 @@ export async function getAllReportsAdmin() {
   const admin = createAdminClient()
   const { data } = await admin
     .from('reports')
-    .select('id, target_type, target_id, reason, status, created_at, reporter:profiles(nickname)')
+    .select('id, target_type, target_id, reason, status, created_at, reporter:profiles!reporter_id(nickname)')
     .order('created_at', { ascending: false })
     .limit(50)
   return data ?? []
